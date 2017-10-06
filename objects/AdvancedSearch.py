@@ -293,7 +293,7 @@ class AdvancedSearch:
                 """
                 
                 def insert_data(store_results, cards_added, card, bold, italic):
-                        store_results.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold, italic, "", 0, "", "", card["coll_ed_nb"], card["price"]])
+                        store_results.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold, italic, "", 0, "", "", card["coll_ed_nb"], card["price"], card["edition_code"]])
                         cards_added.append(card["name"] + "-" + card["nb_variant"] + "-" + card["edition_ln"])
                         functions.various.force_update_gui(0)
                 
@@ -369,8 +369,8 @@ class AdvancedSearch:
                                 functions.various.force_update_gui(0)
                                        
                         scrolledwindow = Gtk.ScrolledWindow()
-                        # "id", "name", "edition", "name_foreign", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", unused1, unused2, unused3, unused4, "coll_ed_nb", "price"
-                        store_results = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float)
+                        # "id", "name", "edition", "name_foreign", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", unused1, unused2, unused3, unused4, "coll_ed_nb", "price", "edition_code"
+                        store_results = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float, str)
                         tree_results = _start(self, store_results, scrolledwindow)
                         cards_added = []
                         

@@ -401,11 +401,11 @@ def prepare_cards_data_for_treeview(cards):
                 name = card[1]
                 # we choose the foreign name
                 nameforeign = card[nb_foreign]
-                
+
                 nameforeign_r = str(nameforeign)
                 names_r = card[3]
                 colors = card[16]
-                
+
                 layout = card[29]
                 if layout == "flip" or layout == "split" or layout == "aftermath":
                         if layout == "flip":
@@ -671,6 +671,17 @@ def get_foreign_name_label():
 
         return foreign__name_label
 
+def _set_edition_icon(_column, cell, list_store, tree_iter, _arg):
+        """Set the 'pixbuf' attribute of a CellRendererPixbuf to the edition icon."""
+        edition_code = list_store[tree_iter][20]
+
+        # TODO: don't reload image each time.
+        image_path = os.path.join(defs.CACHEMCPIC, "icons", valid_filename_os(edition_code) + ".png")
+        if not os.path.isfile(image_path):
+                image_path = os.path.join(defs.PATH_MC, "images", "nothing.png")
+        pixbuf = gdkpixbuf_new_from_file_at_size(image_path, 22, 22)
+        cell.set_property('pixbuf', pixbuf)
+
 def gen_treeview_columns(columns_to_display, treeview):
         """Generates the columns for a treeview which displays cards' data.
 
@@ -706,7 +717,22 @@ def gen_treeview_columns(columns_to_display, treeview):
                 display_column(145, 25, "name", defs.STRINGS["column_english_name"], 1, True)
 
         if "edition" in columns_to_display:
-                display_column(80, 25, "edition", defs.STRINGS["column_edition"], 2, True)
+                edition_column = Gtk.TreeViewColumn(defs.STRINGS["column_edition"])
+
+                renderer_pixbuf_edition = Gtk.CellRendererPixbuf()
+                renderer_pixbuf_edition.set_fixed_size(25, 25)
+                edition_column.pack_start(renderer_pixbuf_edition, False)
+                edition_column.set_cell_data_func(renderer_pixbuf_edition, _set_edition_icon)
+
+                renderer_text_edition = Gtk.CellRendererText()
+                renderer_text_edition.set_fixed_size(80, 25)
+                edition_column.pack_start(renderer_text_edition, True)
+                dict_renderers_list["edition"] = renderer_text_edition
+                edition_column.set_attributes(renderer_text_edition, text=2, weight=w, style=s)
+
+                dict_columns_list["edition"] = edition_column
+                edition_column.set_sort_column_id(2)
+                edition_column.set_expand(True)
 
         if "name_foreign" in columns_to_display:
                 foreign__name_label = get_foreign_name_label()
@@ -819,8 +845,8 @@ def create_window_search_name(request_response, current_object_view):
         scrolledwindow.set_hexpand(True)
         scrolledwindow.set_vexpand(True)
         scrolledwindow.set_shadow_type(Gtk.ShadowType.IN)
-        # "id", "name", "edition", "name_nonenglish", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", unused1, unused2, unused3, unused4, "coll_ed_nb", "price"
-        store_results = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float)
+        # "id", "name", "edition", "name_nonenglish", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", unused1, unused2, unused3, unused4, "coll_ed_nb", "price", "edition_code"
+        store_results = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float, str)
         tree_results = Gtk.TreeView(store_results)
         tree_results.set_enable_search(True)
         if defs.LANGUAGE in defs.LOC_NAME_FOREIGN.keys():
@@ -896,7 +922,7 @@ def create_window_search_name(request_response, current_object_view):
                         add = False
                 
                 if add:
-                        store_results.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold, italic, "", 0, "", "", card["coll_ed_nb"], 0])
+                        store_results.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold, italic, "", 0, "", "", card["coll_ed_nb"], 0, card["edition_code"]])
                         cards_added.append(card["name"] + "-" + card["nb_variant"] + "-" + card["edition_ln"])
                         nb += 1
         

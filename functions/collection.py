@@ -164,8 +164,8 @@ def read_coll(box, coll_object):
                         scrolledwindow.set_vexpand(True)
                         scrolledwindow.set_shadow_type(Gtk.ShadowType.IN)
                         
-                        # "id", "name", "edition", "name_foreign", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", "nb_variant", "nb", unused1, unused2, "coll_ed_nb", "price"
-                        coll_object.mainstore = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float)
+                        # "id", "name", "edition", "name_foreign", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", "nb_variant", "nb", unused1, unused2, "coll_ed_nb", "price", "edition_code"
+                        coll_object.mainstore = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float, str)
                         tree_coll = Gtk.TreeView(coll_object.mainstore)
                         coll_object.tree_coll = tree_coll
                         tree_coll.set_enable_search(True)
@@ -210,7 +210,7 @@ def read_coll(box, coll_object):
                                 bold_card = dict_rowcards_in_coll[id_][1]
                                 italic_card = dict_rowcards_in_coll[id_][2]
                                 
-                                coll_object.mainstore.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold_card, italic_card, card["nb_variant"], nb_card, "", "", card["coll_ed_nb"], card["price"]])
+                                coll_object.mainstore.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold_card, italic_card, card["nb_variant"], nb_card, "", "", card["coll_ed_nb"], card["price"], card["edition_code"]])
                         
                         if defs.LANGUAGE in defs.LOC_NAME_FOREIGN.keys():
                                 coll_object.mainstore.set_sort_column_id(3, Gtk.SortType.ASCENDING)
@@ -1173,8 +1173,8 @@ def gen_details_store(selection, object_origin):
                 else:
                         dict_responses_coll[id_card].append([id_coll, date, condition, lang, foil, loaned_to, comment, deck, deck_side])
         if len(dict_responses_coll) > 0:
-                # id_coll, name, editionln, nameforeign, date, condition, lang, foil, loaned_to, comment, deck, bold, italic, id_db, deck_side, unused1, unused2, unused3, unused4, price
-                details_store = Gtk.ListStore(str, str, str, str, str, str, str, str, str, str, str, int, Pango.Style, str, str, str, str, str, str, float)
+                # id_coll, name, editionln, nameforeign, date, condition, lang, foil, loaned_to, comment, deck, bold, italic, id_db, deck_side, unused1, unused2, unused3, unused4, price, edition_code
+                details_store = Gtk.ListStore(str, str, str, str, str, str, str, str, str, str, str, int, Pango.Style, str, str, str, str, str, str, float, str)
                 list_idscoll_added = []
                 for row in pathlist:
                         if object_origin.__class__.__name__ == "Decks":
@@ -1190,6 +1190,7 @@ def gen_details_store(selection, object_origin):
                                         # sideboard detected
                                         card_name = card_name[:-1].replace("|" + defs.STRINGS["decks_sideboard"], "")
                                 card_editionln = model[row][2]
+                                card_edition_code = model[row][20]
                                 card_nameforeign = model[row][3]
                                 if card_nameforeign[0] == "|" and card_nameforeign[-1] == "|":
                                         # sideboard detected
@@ -1210,7 +1211,7 @@ def gen_details_store(selection, object_origin):
                                                         italic = Pango.Style.ITALIC
                                                 
                                                 if str(id_coll) not in list_idscoll_added:
-                                                        details_store.append([str(id_coll), card_name, card_editionln, card_nameforeign, date, condition, lang, foil, loaned_to, comment, deck, bold, italic, card_id, deck_side, "", "", "", "", 0])
+                                                        details_store.append([str(id_coll), card_name, card_editionln, card_nameforeign, date, condition, lang, foil, loaned_to, comment, deck, bold, italic, card_id, deck_side, "", "", "", "", 0, card_edition_code])
                                                         list_idscoll_added.append(str(id_coll))
                         
                 if "name_foreign" in functions.config.read_config("coll_columns").split(";") and defs.LANGUAGE in defs.LOC_NAME_FOREIGN.keys():
@@ -1576,8 +1577,8 @@ def gen_grid_search_coll(coll_object, searchbar, overlay_coll):
                 c.execute(request)
                 reponses_db = c.fetchall()
                 disconnect_db(conn)
-                # "id", "name", "edition", "name_foreign", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", "nb_variant", "nb", unused1, unused2, "coll_ed_nb", "price"
-                coll_object.searchstore = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float)
+                # "id", "name", "edition", "name_foreign", "colors", colors_pixbuf, "cmc", "type", "artist", "power", "toughness", "rarity", "bold", "italic", "nb_variant", "nb", unused1, unused2, "coll_ed_nb", "price", "edition_code"
+                coll_object.searchstore = Gtk.ListStore(str, str, str, str, str, GdkPixbuf.Pixbuf, int, str, str, str, str, str, int, Pango.Style, str, int, str, str, str, float, str)
                 
                 cards = functions.various.prepare_cards_data_for_treeview(reponses_db)
                 nb_results = len(reponses_db)
@@ -1589,7 +1590,7 @@ def gen_grid_search_coll(coll_object, searchbar, overlay_coll):
                         bold_card = dict_rowcards_in_coll[id_][1]
                         italic_card = dict_rowcards_in_coll[id_][2]
                         
-                        coll_object.searchstore.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold_card, italic_card, card["nb_variant"], nb_card, "", "", card["coll_ed_nb"], card["price"]])
+                        coll_object.searchstore.insert_with_valuesv(-1, range(21), [card["id_"], card["name"], card["edition_ln"], card["nameforeign"], card["colors"], card["pix_colors"], card["cmc"], card["type_"], card["artist"], card["power"], card["toughness"], card["rarity"], bold_card, italic_card, card["nb_variant"], nb_card, "", "", card["coll_ed_nb"], card["price"], card["edition_code"]])
                         if card["id_"] not in defs.SDF_VERSO_IDS_LIST:
                                 nb_cards_disp = nb_cards_disp + nb_card
                         else:
